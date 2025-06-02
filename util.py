@@ -2,10 +2,10 @@
 Some Helpers for data parsing
 """
 
-import kagglehub
-import pathlib
-import numpy as np
 import csv
+import pathlib
+import kagglehub
+import numpy as np
 
 def get_csv_files(name: str="uciml/pima-indians-diabetes-database") -> list[str]:
     """ Get the csv files in path object returned by the kaggle dataset given by name
@@ -21,15 +21,14 @@ def read_csv_files(files: list[str]) -> list[np.ndarray] | np.ndarray:
     out = []
     for file in files:
         file_arr = []
-        with open(file, "r") as f:
-            csvFile = csv.reader(f)
-            for line in csvFile:
+        with open(file, "r", encoding="UTF8") as f:
+            csv_file = csv.reader(f)
+            for line in csv_file:
                 file_arr.append(list(line))
         out.append(np.array(file_arr))
     if len(out) == 1:
         return out[0]
-    else:
-        return out
+    return out
 
 def get_data(name: str="uciml/pima-indians-diabetes-database") -> list[np.ndarray] | np.ndarray:
     """
