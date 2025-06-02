@@ -36,4 +36,3 @@ def get_data(name: str="uciml/pima-indians-diabetes-database") -> list[np.ndarra
     Read in a kaggle dataset into numpy arrays
     """
     return read_csv_files(get_csv_files(name))
-
