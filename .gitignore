@@ -3,3 +3,12 @@
 
 # PyCache
 __pycache__
+
+# Ignore all LaTeX build files
+*.aux
+*.log
+*.toc
+*.out
+*fdb_latexmk
+*.fls
+*.synctex.gz
