@@ -25,4 +25,4 @@ Part | Description | Status
 
 ## P1
 My first model was implemented Binary logistic regression. I decided to define my objective function via Log-Likelihood. Thus, the optimization step was focused on converging towards the maximum of the objective. Due to the structure of the objective function (which is explored in depth in the write up) I applied the Newton-Raphson method to converge to a zero
-of the gradient of the objective function and used this for predictions. Before any hyperparameter training and model tuning the model had a 79% accuracy, which is a decent starting point.
+of the gradient of the objective function and used this for predictions. Before any hyperparameter training and model tuning the model had a 78% accuracy, which is a decent starting point.
