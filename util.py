@@ -7,7 +7,7 @@ import pathlib
 import kagglehub
 import numpy as np
 
-def get_csv_files(name: str="uciml/pima-indians-diabetes-database") -> list[str]:
+def get_csv_files(name) -> list[str]:
     """ Get the csv files in path object returned by the kaggle dataset given by name
     """
     path = kagglehub.dataset_download(name)
@@ -30,7 +30,7 @@ def read_csv_files(files: list[str]) -> list[np.ndarray] | np.ndarray:
         return out[0]
     return out
 
-def get_data(name: str="uciml/pima-indians-diabetes-database") -> list[np.ndarray] | np.ndarray:
+def get_data(name) -> list[np.ndarray] | np.ndarray:
     """
     Read in a kaggle dataset into numpy arrays
     """
