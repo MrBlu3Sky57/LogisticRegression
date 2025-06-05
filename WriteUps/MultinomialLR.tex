@@ -55,7 +55,9 @@ Thus:
      \mathcal{L}_{rj}(\theta) &= \delta_{{y_r}j}\log(\exp((\theta^{(j)})^Tx_r)) - \log(1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)) \\
      &= \delta_{{y_r}j}(\theta^{(j)})^Tx_r - \log(1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx))
 \end{align*}
-Taking the partial derivative with respect to $\theta^{(j)}$ we find
+
+\section*{Gradient Calculations}
+First lets take the partial derivative with respect to $\theta^{(j)}$ we find
 \begin{align*}
     \frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &= \delta_{y_r j}x_r - \frac{x_r\exp((\theta^{(j)})^Tx_r)}{1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)} \\
     &= x_r(\delta_{y_rj} - \Pr(j|x_i))
@@ -72,11 +74,18 @@ We can make this more compact utilizing the kronecker delta function:
     \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &=
     x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r))
 \end{align*}
-So the total second derivative of $\mathcal{L}$ is:
+Now let $\Pr(j|x_r) = P_{jr}$ So the total second derivative of $\mathcal{L}$ is:
 \begin{align*}
     \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}}{\partial \theta^{(j)}} &=
-    \displaystyle \sum_{1 \leq r \leq n}x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r)) \\
-    &= \displaystyle \sum_{1 \leq r \leq n}x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r))
+    \displaystyle \sum_{1 \leq r \leq n}x_rx_r^Tp_{ir}(\delta_{ij} - p_{jr}) \\
+    &= \displaystyle \sum_{1 \leq r \leq n}x_rx_r^Tp_{ir}(\delta_{ij} - p_{jr})
 \end{align*}
-
+If we let $W_{ij} = \text{diag}(p_{ir}(\delta_{ij} - p_{jr}))_r$ We can write this more compactly by observing that
+\begin{align*}
+    \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}}{\partial \theta^{(j)}} &= X^TW_{ij}X
+\end{align*}
+Thus the Hessian of the Log-Likelihood is the block matrix H with
+blocks $H_{ij} = W_{ij}$, where this is the Hessian of the flattened vector $\theta$
+made by combining all $\theta^{(1)}, \ldots, \theta^{(K - 1)}$. Note that the Gradient
+of this flattened vector is the vector created by stacking the columns of the Jacobian.
 \end{document}
