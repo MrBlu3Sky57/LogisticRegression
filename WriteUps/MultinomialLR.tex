@@ -1,0 +1,82 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Binary Logistic Regression}
+\author{Aaron Avram}
+\date{June 4 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+In this write up I will go through my derivation of the objective function and the optimization algorithm for my Multinomial
+Logistic Regression model.
+
+\section*{Construction}
+For my notation let $X \in \mathbb{R}^{n \times p}$ be the matrix
+with each of the n training inputs as rows. Where we define p to be the dimension
+of each input vector (or equivalently the number of features). Next
+let $y \in \{1, \ldots, K \}^n$ equal the vector of training labels, where there are K
+output classes. I will apply the shortcut used in the Binary Model Construction
+where each row of X is given an additional final entry with a 1, to account for the bias term. So $X$
+is now a $n \times (p+1)$ dimensional matrix. The model is parametrized by $K - 1$
+$p + 1$ dimensional vectors $\theta^{(1)}, \ldots, \theta^{(k-1)}$, which I will collectively refer to by the
+flattened combined vector $\theta$. Where the probabilities
+are given by:
+\begin{align*}
+    \Pr(\kappa | x; \theta^{(\kappa)}) &= \begin{cases}
+        \frac{\exp((\theta^{(\kappa)})^Tx)}{1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)} & \kappa < K \\
+        \frac{1}{1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)} & \kappa = K
+    \end{cases}
+\end{align*}
+The log likelihood function is then given by:
+\begin{align*}
+    \mathcal{L}(\theta) &= \displaystyle \sum_{1 \leq r \leq n}\log\Pr(y_r | x_r; \theta^{y_r}) \\
+    &\text{Using a one hot encoding with the kronecker delta function we can write this as: } \\
+    &= \displaystyle \sum_{1 \leq r \leq n} \sum_{1 \leq s \leq K}\delta_{y_rs}\log\Pr(y_r | x_r; \theta^{(s)}) \\
+\end{align*}
+Consider the Likelihood function with respect to one input vector $x_r$
+and one parameter $\theta^{(j)}$:
+\begin{align*}
+    \mathcal{L}_{rj}(\theta) &= \log\Pr(y_r | x_r)  
+\end{align*}
+However we can condense this further, as if $y_r \neq j$ the numerator of the probability
+function is irrelevant to $\theta^{(j)}$, and if we decompose the fraction via the logarithm rules
+we can omit the numerator term and replace it with a kronecker delta. I.e Suppose $\Pr = N/D$
+then $\log(\Pr) = \log(N) - \log(D)$  and so if N is independent of $\theta^(j)$ we can omit it.
+Thus:
+\begin{align*}
+     \mathcal{L}_{rj}(\theta) &= \delta_{{y_r}j}\log(\exp((\theta^{(j)})^Tx_r)) - \log(1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)) \\
+     &= \delta_{{y_r}j}(\theta^{(j)})^Tx_r - \log(1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx))
+\end{align*}
+Taking the partial derivative with respect to $\theta^{(j)}$ we find
+\begin{align*}
+    \frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &= \delta_{y_r j}x_r - \frac{x_r\exp((\theta^{(j)})^Tx_r)}{1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)} \\
+    &= x_r(\delta_{y_rj} - \Pr(j|x_i))
+\end{align*}
+Now let us take the second partial derivative of this expression with respect to $\theta^{(i)}$
+\begin{align*}
+    \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &= \begin{cases}
+        -x_rx_r^T\Pr(j|x_r)(1 - \Pr(j|x_r)) & i = j \\
+        x_rx_r^T\Pr(j|x_r)\Pr(i|x_r) & i \neq j
+    \end{cases}
+\end{align*}
+We can make this more compact utilizing the kronecker delta function:
+\begin{align*}
+    \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &=
+    x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r))
+\end{align*}
+So the total second derivative of $\mathcal{L}$ is:
+\begin{align*}
+    \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}}{\partial \theta^{(j)}} &=
+    \displaystyle \sum_{1 \leq r \leq n}x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r)) \\
+    &= \displaystyle \sum_{1 \leq r \leq n}x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r))
+\end{align*}
+
+\end{document}
