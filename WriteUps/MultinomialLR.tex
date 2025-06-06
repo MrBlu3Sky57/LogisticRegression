@@ -149,13 +149,39 @@ of the r-th training sample. Now consider first $Xv_j$:
         X_1^Tv_j \\ \vdots \\ X_n^Tv_j
     \end{bmatrix}
 \end{align*}
+If we let $Z = XV$ clearly $Z_{:, j} = Xv_j$
+
+
 Since $W_{ij}$ is a diagonal matrix, multiplying $Xv_j$ by it corresponds to
 elementwise scaling by the diagonal elements of $W_{ij}$.
 \begin{align*}
-    Xv_j &= \begin{bmatrix}
-        X_1^Tv_j \\ \vdots \\ X_n^Tv_j
+    W_{ij}Xv_j &= \begin{bmatrix}
+        (W_{ij})_{11}X_1^Tv_j \\ \vdots \\(W_{ij})_{nn} X_n^Tv_j
     \end{bmatrix}
+    \\ \\
+    &= \begin{bmatrix}
+        P_{1i}(\delta_{ij} - P_{1j})X_1^Tv_j \\ \vdots \\P_{ni}(\delta_{ij} - P_{nj})X_n^Tv_j
+    \end{bmatrix}
+    \\ \\
+    &= \begin{bmatrix}
+        P_{1i}\delta_{ij}X_1^Tv_j \\ \vdots \\P_{ni}\delta_{ij}X_n^Tv_j
+    \end{bmatrix} \; - \;
+    \begin{bmatrix}
+        P_{1i}P_{1j}X_1^Tv_j \\ \vdots \\P_{ni}P_{nj}X_n^Tv_j
+    \end{bmatrix}.
 \end{align*}
-
-
+However since we are summing these vectors over all $j$ the Kronecker Delta
+term will be equal to 1 exactly once, thus:
+\begin{align*}
+    \overline{Z}_{:, i} &:= \displaystyle \sum_{j = 1}^{C-1} W_{ij}Xv_j \\
+    &= P_{:, i} \odot Z_{:, i} - (P_{:, i}) \odot \sum_{j=1}^{C - 1}P_{:, j} \odot Z_{:, j}
+\end{align*}
+So $(Hv)_i = X^TZ_{:, i}$. If we view $(Hv)_i$ as the i-th column in a matrix we can write:
+$Hv = X^TZ$. And we can compute $Z$ directly. Let $A := P \odot Z$ which is clearly the matrix
+with $A_{:, i} = P_{:, i} \odot Z_{:, i}$. Then if we consider $A(1_{C-1})$ this
+is the vector with the each entry corresponding to the sum $\displaystyle \sum_{j=1}^{C - 1}P_{:, j} \odot Z_{:, j}$
+Then if we take $P \odot A(1_{C-1})$ where we broadcast by copying the columns of the sum vector
+to form a matrix, we have $\overline{Z} = A - P \odot A(1_{C-1})$ and with this we have 
+constructed $Hv$ without actually building the explicit matrix, and can use this
+for the conjugate gradient method.
 \end{document}
