@@ -25,7 +25,7 @@ of each input vector (or equivalently the number of features). Next
 let $y \in \{1, \ldots, K \}^n$ equal the vector of training labels, where there are K
 output classes. I will apply the shortcut used in the Binary Model Construction
 where each row of X is given an additional final entry with a 1, to account for the bias term. So $X$
-is now a $n \times (p+1)$ dimensional matrix. The model is parametrized by $K - 1$
+is now a $n \times (p+1)$ dimensional matrix. Where we can let $p + 1 = d$ as our feature number. The model is parametrized by $K - 1$
 $p + 1$ dimensional vectors $\theta^{(1)}, \ldots, \theta^{(k-1)}$, which I will collectively refer to by the
 flattened combined vector $\theta$. Where the probabilities
 are given by:
@@ -49,7 +49,7 @@ and one parameter $\theta^{(j)}$:
 However we can condense this further, as if $y_r \neq j$ the numerator of the probability
 function is irrelevant to $\theta^{(j)}$, and if we decompose the fraction via the logarithm rules
 we can omit the numerator term and replace it with a kronecker delta. I.e Suppose $\Pr = N/D$
-then $\log(\Pr) = \log(N) - \log(D)$  and so if N is independent of $\theta^(j)$ we can omit it.
+then $\log(\Pr) = \log(N) - \log(D)$  and so if N is independent of $\theta^{(j)}$ we can omit it.
 Thus:
 \begin{align*}
      \mathcal{L}_{rj}(\theta) &= \delta_{{y_r}j}\log(\exp((\theta^{(j)})^Tx_r)) - \log(1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)) \\
@@ -62,6 +62,11 @@ First lets take the partial derivative with respect to $\theta^{(j)}$ we find
     \frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &= \delta_{y_r j}x_r - \frac{x_r\exp((\theta^{(j)})^Tx_r)}{1 + \displaystyle \sum_{1 \leq i < K}\exp((\theta^{(i)})^Tx)} \\
     &= x_r(\delta_{y_rj} - \Pr(j|x_i))
 \end{align*}
+Reusing some calculations from the previous write up it is clear that
+$\frac{\partial \mathcal{L}}{\partial \theta^{(j)}} = X(y - p_j)$ Which form 
+the columns of the Jacobian matrix of $\mathcal{L}$.
+
+
 Now let us take the second partial derivative of this expression with respect to $\theta^{(i)}$
 \begin{align*}
     \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &= \begin{cases}
@@ -74,7 +79,7 @@ We can make this more compact utilizing the kronecker delta function:
     \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}_{rj}}{\partial \theta^{(j)}} &=
     x_rx_r^T\Pr(i|x_r)(\delta_{ij} - \Pr(j|x_r))
 \end{align*}
-Now let $\Pr(j|x_r) = P_{jr}$ So the total second derivative of $\mathcal{L}$ is:
+Now let $\Pr(j|x_r) = p_{jr}$ So the total second derivative of $\mathcal{L}$ is:
 \begin{align*}
     \frac{\partial}{\partial \theta^{(i)}}\frac{\partial \mathcal{L}}{\partial \theta^{(j)}} &=
     \displaystyle \sum_{1 \leq r \leq n}x_rx_r^Tp_{ir}(\delta_{ij} - p_{jr}) \\
@@ -88,4 +93,69 @@ Thus the Hessian of the Log-Likelihood is the block matrix H with
 blocks $H_{ij} = W_{ij}$, where this is the Hessian of the flattened vector $\theta$
 made by combining all $\theta^{(1)}, \ldots, \theta^{(K - 1)}$. Note that the Gradient
 of this flattened vector is the vector created by stacking the columns of the Jacobian.
+
+\section*{Optimization}
+The objective function will be maximized via the Newton-Raphson Method. Reusing work from the previous write up,
+the update rule is given by:
+\begin{align*}
+\theta^{(new)} &= \theta^{(old)} + H^{-1}(\nabla_\theta(\mathcal{L})(\theta^{(old)}))
+\end{align*}
+Where H represents the full hessian matrix and $\nabla_\theta(\mathcal{L})$ is the
+flattened Jacobian where each column of the Jacobian is stacked (So that the gradients
+of each class parameter are kept together). If we let $g = \nabla_\theta(\mathcal{L})(\theta^{(old)})$
+We can simplify the computations in each step of the method by solving for $\Delta \theta = \theta^{(new)} - \theta^{(old)}$.
+Where $H(\Delta \theta) = g$. $H$ is a semi-positive definite matrix. If we apply some regularization we can ensure
+that $H$ is a positive definite matrix, and so can use the conjugate gradient method to
+solve for $\Delta \theta$. This method leverages the property that given $u, v \in \mathbb{R}^{m}$ ($m := d\times(C-1)$),
+$u^THv$ defines an inner product $\langle u, v \rangle_H := u^THv$, a fact that is easy to check. By 
+Gram-Schmidt we can always find a basis of orthogonal vectors $P_1, \ldots, P_m$ for the inner product space
+given by $\mathbb{R}^m$ with respect to this inner product. Thus, we can express $\Delta \theta$ as a linear
+combination of these vectors with coefficients $\alpha_1, \ldots \alpha_m$. Thus:
+\begin{align*}
+H(\Delta \theta) &= \displaystyle H(\sum_{i=1}^{m}\alpha_ip_i) \\
+g &= \sum_{i=1}^{m}\alpha_iHp_i
+\end{align*}
+Now left multiplying by taking the dot product with $p_k$ we have:
+\begin{align*}
+    p_k^Tg &= \displaystyle p_k^T\sum_{i=1}^{m}\alpha_iHp_i \\
+    &= \sum_{i=1}^{m}\alpha_ip_k^THp_i \\
+    &= \sum_{i=1}^{m}\alpha_i\langle p_k, p_i \rangle_H
+\end{align*}
+By the orthonormality of the basis we have:
+\begin{align*}
+    p_k^Tg &= \alpha_k\langle p_k, p_k \rangle \\
+    \alpha_k &= \frac{p_k^Tg}{\langle p_k, p_k \rangle_H}
+\end{align*}
+This gives us an algorithm for computing the coefficient of a basis vector.
+We can combine this with the Gram-Schmidt algorithm for computing this orthogonal
+basis and recover the coefficients at each step.
+
+
+This can save us a lot of time as H is only used to compute the inner product,
+but since H is a block matrix and v is a block vector we can use this to compute $Hv$
+without ever constructing $H$, saving a lot of computing time. To do this consider
+the block vector $Hv$ where $H$ and $v$ are viewed as a block matrix and a block vector
+respectively. You can think of $v$ as a magtrix with each column $i$ being an arbitrary 
+parameter vector for class $i$. By the block matrix-vector multiplication rule we have:
+\begin{align*}
+    (Hv)_i &= \displaystyle \sum_{j = 1}^{C-1} H_{ij}v_j \\
+    &= \sum_{j = 1}^{C-1} X^TW_{ij}Xv_j \\
+    &= X^T\sum_{j = 1}^{C-1} W_{ij}Xv_j
+\end{align*}
+Fix $P$ to be the matrix with its r-th row containing the probability vector
+of the r-th training sample. Now consider first $Xv_j$:
+\begin{align*}
+    Xv_j &= \begin{bmatrix}
+        X_1^Tv_j \\ \vdots \\ X_n^Tv_j
+    \end{bmatrix}
+\end{align*}
+Since $W_{ij}$ is a diagonal matrix, multiplying $Xv_j$ by it corresponds to
+elementwise scaling by the diagonal elements of $W_{ij}$.
+\begin{align*}
+    Xv_j &= \begin{bmatrix}
+        X_1^Tv_j \\ \vdots \\ X_n^Tv_j
+    \end{bmatrix}
+\end{align*}
+
+
 \end{document}
