@@ -24,5 +24,8 @@ Part | Description | Status
 3    | Multinomial LR | TODO
 
 ## P1
-My first model was implemented Binary logistic regression. I decided to define my objective function via Log-Likelihood. Thus, the optimization step was focused on converging towards the maximum of the objective. Due to the structure of the objective function (which is explored in depth in the write up) I applied the Newton-Raphson method to converge to a zero
+My first model implemented Binary logistic regression. I decided to define my objective function via Log-Likelihood. Thus, the optimization step was focused on converging towards the maximum of the objective. Due to the structure of the objective function (which is explored in depth in the write up) I applied the Newton-Raphson method to converge to a zero
 of the gradient of the objective function and used this for predictions. Before any hyperparameter training and model tuning the model had a 78% accuracy, which is a decent starting point.
+
+## P2
+My second model implemented One Versus Rest logistic regression. This is just repeated application of Binary logistic regression so a lot of the details from part 1 carried over. The main changes were for efficiency, as I used the MNIST digit dataset for this part which is quite large and so I had to employ stochastic methods to make the training process feasible. Despite my optimizations the model was still quite slow, but it ended up with a 85% accuracy which is a decent benchmark. I decided not to spend time optimizing the model further as it is basically a cruder version of the model employed in part 3, which I will spend more time working on.
