@@ -1,0 +1,11 @@
+# Core numerical stack
+numpy>=1.26,<2.0
+
+# Optional helpers that many notebooks assume
+scikit-learn>=1.5,<2.0    # toy datasets, metrics, benchmarks
+matplotlib>=3.9,<4.0      # quick plots inside notebooks
+
+# Jupyter runtime (often pre-installed on cloud or VS Code –
+# include it only if you want `pip install -r requirements.txt`
+# to create a fully-offline environment)
+jupyterlab>=4.2,<5.0      # or 'notebook' if you prefer the classic UI
