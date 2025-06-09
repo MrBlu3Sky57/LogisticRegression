@@ -50,3 +50,10 @@ longer worthwhile.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
+
+## Acknowledgments
+
+This project was developed independently, but the following resource was extremely helpful for understanding the concepts:
+- ESL by Hastie, Tibshirani, Friedman (for SVM background)
+
+All code and math were implemented from scratch using NumPy.
