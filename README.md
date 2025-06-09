@@ -20,8 +20,8 @@ Here is a tabular description:
 Part | Description | Status
 ---- | ----------- | ------
 1    | Binary LR| DONE
-2    | One Versus Rest LR | TODO
-3    | Multinomial LR | TODO
+2    | One Versus Rest LR | DONE
+3    | Multinomial LR | DONE
 
 ## P1
 My first model implemented Binary logistic regression. I decided to define my objective function via Log-Likelihood. Thus, the optimization step was focused on converging towards the maximum of the objective. Due to the structure of the objective function (which is explored in depth in the write up) I applied the Newton-Raphson method to converge to a zero
@@ -29,3 +29,24 @@ of the gradient of the objective function and used this for predictions. Before 
 
 ## P2
 My second model implemented One Versus Rest logistic regression. This is just repeated application of Binary logistic regression so a lot of the details from part 1 carried over. The main changes were for efficiency, as I used the MNIST digit dataset for this part which is quite large and so I had to employ stochastic methods to make the training process feasible. Despite my optimizations the model was still quite slow, but it ended up with a 85% accuracy which is a decent benchmark. I decided not to spend time optimizing the model further as it is basically a cruder version of the model employed in part 3, which I will spend more time working on.
+
+## P3
+My third model implemented multinomial logistic regression, and was meant as an extension of part 2. I made changes to how I approached the optimization process for efficiency reasons, however the sheer size of
+the MNIST dataset combined with the fact that I was only using Numpy for
+my implementation made me run into a wall. My training loop would take an
+unreasonable amount of time, so I decided to use two smaller datasets instead. First I used the Iris dataset as a toy dataset to make sure
+my model worked correctly then used the pen digits dataset for actual model building. This dataset was still reasonably large but tractable
+for my model. I ended up with a 92% accuracy on my model which I was quite
+happy with, as sci-kit learn logistic regression performs worse on the same dataset.
+
+## Takeaways
+I learned a lot from this project. I did not have too much difficulty with the actual model building process, but I learned a lot of lessons
+about optimizing Numpy BLAS calls and reducing the computational cost
+of matrix based operations. For this project I was able to manage and build models with a solid performance but I think that I also realized why
+most people use PyTorch or TensorFlow instead of pure Numpy. When I begin
+to implement more complicated models I think I will make the switch
+as the tradeoff between lower level understanding and performance is no
+longer worthwhile.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
