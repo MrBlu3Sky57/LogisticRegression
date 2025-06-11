@@ -7,6 +7,7 @@ This is a project where I implement different forms of logistic regression (LR) 
 - [P2](#p2)
 - [P2](#p3)
 - [Takeaways](#takeaways)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ## Plan
@@ -47,6 +48,13 @@ most people use PyTorch or TensorFlow instead of pure Numpy. When I begin
 to implement more complicated models I think I will make the switch
 as the tradeoff between lower level understanding and performance is no
 longer worthwhile.
+
+## Acknowledgments
+
+This project was developed independently, but the following resource was extremely helpful for understanding the concepts:
+- ESL by Hastie, Tibshirani, Friedman (for SVM background)
+
+All code and math were implemented from scratch using NumPy.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
